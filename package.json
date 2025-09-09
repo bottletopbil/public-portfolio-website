@@ -17,10 +17,13 @@
     "aceternity-ui": "^0.2.2",
     "framer-motion": "^11.18.2",
     "gsap": "^3.13.0",
+    "motion": "^12.23.12",
+    "ogl": "^0.0.105",
     "postprocessing": "^6.37.7",
     "react": "^19.1.1",
     "react-animated-cursor": "^2.11.2",
     "react-dom": "^19.1.1",
+    "simplex-noise": "^4.0.3",
     "three": "^0.180.0"
   },
   "devDependencies": {

@@ -36,6 +36,7 @@ export interface ParticleTextEffectProps {
   particleDensity?: number;
   visibleChars?: number; // number of characters to render (for pop-in)
   anchorText?: string; // full text used for centering and gradient width
+  fontSizeOffsetPx?: number; // add/subtract pixels to computed font size
 }
 
 const ParticleTextEffect: React.FC<ParticleTextEffectProps> = ({
@@ -49,6 +50,7 @@ const ParticleTextEffect: React.FC<ParticleTextEffectProps> = ({
   particleDensity = 4,
   visibleChars,
   anchorText,
+  fontSizeOffsetPx = 0,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -92,7 +94,11 @@ const ParticleTextEffect: React.FC<ParticleTextEffectProps> = ({
       this.pv = 0;
       this.ov = 0;
       this.f = rand(animationForce + 15, animationForce - 15);
-      this.rgb = rgb.map(c => Math.max(0, c + rand(13, -13)));
+      // Slight color jitter for organic look, but clamp hard to avoid
+      // occasional high-chroma outliers from AA/fringe samples.
+      this.rgb = Array.from(rgb, (c) =>
+        Math.min(255, Math.max(0, Math.round(c + rand(6, -6))))
+      );
     }
 
     draw() {
@@ -166,7 +172,12 @@ const ParticleTextEffect: React.FC<ParticleTextEffectProps> = ({
         });
       }
       return arr;
-    }, []).filter(p => p.rgb[3] && !(p.x % particleDensity) && !(p.y % particleDensity));
+    }, [])
+    // Ignore low-alpha edge pixels; these can include color-fringe AA samples
+    // that show up as occasional bright dots (e.g., magenta) once jitter is applied.
+    .filter(
+      (p) => p.rgb[3] > 200 && !(p.x % particleDensity) && !(p.y % particleDensity)
+    );
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -182,7 +193,10 @@ const ParticleTextEffect: React.FC<ParticleTextEffectProps> = ({
         existing.cx = x;
         existing.cy = y;
         if (existing.cr < existing.or) existing.cr = existing.or;
-        existing.rgb = rgb;
+        // Replace color, ensuring we store a plain array and clamp values.
+        existing.rgb = Array.from(rgb.slice(0, 3), (c) =>
+          Math.min(255, Math.max(0, Math.round(c)))
+        );
         existing.draw();
       } else {
         const p = new ParticleClass(x, y, rgb);
@@ -200,11 +214,13 @@ const ParticleTextEffect: React.FC<ParticleTextEffectProps> = ({
     if (!canvas || !ctx) return;
 
     const full = text;
-    const anchor = anchorText || full;
-    const count = typeof visibleChars === 'number' ? Math.max(0, Math.min(full.length, visibleChars)) : full.length;
+    const multiline = full.split(/\r?\n/);
+    const anchorLines = (anchorText || full).split(/\r?\n/);
 
+    const longestAnchorLen = anchorLines.reduce((m, l) => Math.max(m, l.length), 0);
     textBox.str = full;
-    textBox.h = Math.floor(canvas.width / Math.max(1, anchor.length));
+    const baseH = Math.floor(canvas.width / Math.max(1, longestAnchorLen));
+    textBox.h = Math.max(1, baseH + Math.round(fontSizeOffsetPx));
 
     interactionRadiusRef.current = Math.max(50, textBox.h * 1.5);
 
@@ -212,23 +228,32 @@ const ParticleTextEffect: React.FC<ParticleTextEffectProps> = ({
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
 
-    const anchorWidth = Math.round(ctx.measureText(anchor).width);
-    textBox.w = anchorWidth;
-    textBox.x = 0.5 * (canvas.width - textBox.w);
-    textBox.y = 0.5 * (canvas.height - textBox.h);
+    // Measure widths per line to center each, and compute overall box
+    const lineHeights = textBox.h; // uniform
+    const lineGap = Math.round(textBox.h * 0.1);
+    const totalHeight = multiline.length * lineHeights + (multiline.length - 1) * lineGap;
+    const lineWidths = multiline.map((l) => Math.round(ctx.measureText(l).width));
+    const maxWidth = lineWidths.reduce((m, w) => Math.max(m, w), 0);
 
-    const gradient = ctx.createLinearGradient(textBox.x, textBox.y, textBox.x + textBox.w, textBox.y + textBox.h);
+    textBox.w = maxWidth;
+    textBox.x = 0.5 * (canvas.width - textBox.w);
+    textBox.y = 0.5 * (canvas.height - totalHeight);
+
+    // Update textbox height to cover all lines so dottify samples full area
+    textBox.h = totalHeight;
+
+    const gradient = ctx.createLinearGradient(textBox.x, textBox.y, textBox.x + textBox.w, textBox.y + totalHeight);
     const N = colors.length - 1;
     colors.forEach((c, i) => gradient.addColorStop(i / N, `#${c}`));
     ctx.fillStyle = gradient;
 
-    // Draw only the visible characters, anchored to the full width
-    let offsetX = 0;
-    for (let i = 0; i < count; i++) {
-      const ch = full[i];
-      ctx.fillText(ch, textBox.x + offsetX, 0.5 * canvas.height);
-      offsetX += ctx.measureText(ch).width;
-    }
+    // Draw lines centered horizontally
+    multiline.forEach((line, i) => {
+      const lw = lineWidths[i];
+      const x = 0.5 * (canvas.width - lw);
+      const y = textBox.y! + i * (lineHeights + lineGap) + lineHeights / 2;
+      ctx.fillText(line, x, y);
+    });
     dottify();
   };
 
@@ -268,7 +293,7 @@ const ParticleTextEffect: React.FC<ParticleTextEffectProps> = ({
 
   useEffect(() => {
     initialize();
-  }, [text, colors, animationForce, particleDensity, canvasSize, visibleChars, anchorText]);
+  }, [text, colors, animationForce, particleDensity, canvasSize, visibleChars, anchorText, fontSizeOffsetPx]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -291,6 +316,14 @@ const ParticleTextEffect: React.FC<ParticleTextEffectProps> = ({
         animationIdRef.current = null;
       }
     };
+  }, []);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined' && 'fonts' in document) {
+      (document as any).fonts.ready.then(() => {
+        initialize();
+      });
+    }
   }, []);
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {

@@ -220,7 +220,7 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
     }
   };
 
-  const glassSurfaceClasses = 'relative flex items-center justify-center overflow-hidden transition-opacity duration-[260ms] ease-out';
+  const glassSurfaceClasses = 'relative flex items-center justify-center overflow-hidden transition-opacity duration-300 ease-out';
 
   return (
     <div ref={containerRef} className={`${glassSurfaceClasses} ${className}`} style={getContainerStyles()}>
@@ -261,8 +261,8 @@ const GlassNavbar: React.FC = () => {
       brightness={isDarkMode ? 20 : 80}
     >
       <nav
-        className="w-full h-full flex items-center justify-center px-6"
-        style={{ fontFamily: 'Verdana, sans-serif' }}
+        className="w-full h-full flex items-center justify-center px-6 tracking-wide"
+        style={{ fontFamily: 'Bebas Neue, sans-serif' }}
       >
         <ul className="flex items-center space-x-6">
           {['Home', 'About', 'Services', 'Contact'].map((item) => (

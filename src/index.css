@@ -87,7 +87,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Neue Haas Grotesk Display Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Bebas Neue', sans-serif;
   }
 }
 
