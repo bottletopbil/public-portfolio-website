@@ -194,7 +194,7 @@ const ParticleTextEffect: React.FC<ParticleTextEffectProps> = ({
         existing.cy = y;
         if (existing.cr < existing.or) existing.cr = existing.or;
         // Replace color, ensuring we store a plain array and clamp values.
-        existing.rgb = Array.from(rgb.slice(0, 3), (c) =>
+        existing.rgb = Array.from(rgb.slice(0, 3), (c: number) =>
           Math.min(255, Math.max(0, Math.round(c)))
         );
         existing.draw();

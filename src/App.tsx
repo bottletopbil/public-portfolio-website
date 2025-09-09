@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ParticleTextEffect } from "@/components/ui/interactive-text-particle";
+import { BackgroundLines } from "@/components/ui/background-lines";
 import { GlassNavbar } from "@/components/ui/glass";
 import { ZoomParallax } from "@/components/ui/zoom-parallax";
 // removed flower overlay in favor of WavyBackground
@@ -113,13 +114,29 @@ function App() {
 
       {/* HELLO hero section */}
       <section className="relative h-screen overflow-hidden">
-        <ParticleTextEffect
-          text={"Riley's\nWeb Designs"}
-          fontSizeOffsetPx={15}
-          className={`w-full h-full relative z-10 transition-opacity duration-700 ${
-            visible ? "opacity-100" : "opacity-0"
-          }`}
-        />
+        {/* Shared colors for particles and background lines */}
+        {(() => {
+          const particleColors = [
+            'ffad70', 'f7d297', 'edb9a1', 'e697ac', 'b38dca',
+            '9c76db', '705cb5', '43428e', '2c2142'
+          ];
+          return (
+            <BackgroundLines
+              colors={particleColors}
+              svgOptions={{ duration: 12 }}
+              className={`relative h-full w-full bg-black transition-opacity duration-700 ${
+                visible ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <ParticleTextEffect
+                text={"Riley's\nWeb Designs"}
+                colors={particleColors}
+                fontSizeOffsetPx={15}
+                className="w-full h-full absolute inset-0 z-10"
+              />
+            </BackgroundLines>
+          );
+        })()}
       </section>
 
       {/* Zoom Parallax below HELLO */}
