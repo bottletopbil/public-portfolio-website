@@ -262,14 +262,14 @@ const GlassNavbar: React.FC = () => {
     >
       <nav
         className="w-full h-full flex items-center justify-center px-6 tracking-wide"
-        style={{ fontFamily: 'Bebas Neue, sans-serif' }}
+        style={{ fontFamily: 'Poppins, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif' }}
       >
         <ul className="flex items-center space-x-6">
           {['Home', 'About', 'Services', 'Contact'].map((item) => (
             <li key={item}>
               <a
                 href="#"
-                className="font-medium text-white mix-blend-difference transition-opacity duration-200 hover:opacity-80"
+                className="font-bold text-white mix-blend-difference transition-opacity duration-200 hover:opacity-80"
               >
                 {item}
               </a>

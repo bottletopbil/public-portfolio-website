@@ -224,7 +224,7 @@ const ParticleTextEffect: React.FC<ParticleTextEffectProps> = ({
 
     interactionRadiusRef.current = Math.max(50, textBox.h * 1.5);
 
-    ctx.font = `900 ${textBox.h}px Verdana, sans-serif`;
+    ctx.font = `800 ${textBox.h}px Poppins, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif`;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
 

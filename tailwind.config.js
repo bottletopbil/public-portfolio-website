@@ -6,18 +6,21 @@ module.exports = {
     "./src/**/*.{ts,tsx,js,jsx}",
   ],
   theme: {
-  	container: {
-  		center: true,
-  		padding: '2rem',
-  		screens: {
-  			'2xl': '1400px'
-  		}
-  	},
-  	extend: {
-  		colors: {
-  			border: 'hsl(var(--border))',
-  			input: 'hsl(var(--input))',
-  			ring: 'hsl(var(--ring))',
+	container: {
+		center: true,
+		padding: '2rem',
+		screens: {
+			'2xl': '1400px'
+		}
+	},
+	extend: {
+		fontFamily: {
+			sans: ['Poppins', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+		},
+		colors: {
+			border: 'hsl(var(--border))',
+			input: 'hsl(var(--input))',
+			ring: 'hsl(var(--ring))',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			primary: {
@@ -87,4 +90,3 @@ module.exports = {
   },
   plugins: [require("tailwindcss-animate")],
 };
-

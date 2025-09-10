@@ -146,7 +146,7 @@ const DEFAULT_WORDS = ["HELLO"]
 export function ParticleTextEffect({
   words = DEFAULT_WORDS,
   fontSize = 200,
-  fontFamily = "'Neue Haas Grotesk Display Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+  fontFamily = "Poppins, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
   className = "",
   speedScale = 1,
 }: ParticleTextEffectProps) {
